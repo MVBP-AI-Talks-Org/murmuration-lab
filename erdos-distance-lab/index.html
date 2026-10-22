@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#071626">
+<meta name="description" content="Explore the Erdős unit-distance problem with draggable points, lattice arrangements, live distance graphs, and a mathematical optimization sandbox.">
+<title>Erdős Distance Lab | AI-Talks.org</title>
+<style>
+:root{color-scheme:dark;--bg:#071321;--panel:#102235;--panel2:#142b41;--line:rgba(168,208,225,.16);--fg:#edf6f8;--muted:#abc1ce;--aqua:#6fe1cd;--gold:#fac889;--blue:#96bbff;--coral:#ff9889}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 30% -10%,#17354d 0,#071522 52%,#050c16 100%);font:15px/1.55 system-ui,-apple-system,Segoe UI,sans-serif;color:var(--fg)}
+button,select,input{font:inherit}button{cursor:pointer}a{color:#9deadd}a:hover{color:white}
+.shell{width:min(1370px,calc(100% - 36px));margin:auto;padding:26px 0 54px}
+header{display:flex;justify-content:space-between;align-items:center;gap:14px;border-bottom:1px solid var(--line);padding-bottom:16px;flex-wrap:wrap}
+.brand{color:#c8e9e5;text-decoration:none;font-size:12px;font-weight:800;letter-spacing:.13em;display:flex;gap:11px;align-items:center}.mark{width:34px;height:34px;border:1px solid #3c7081;display:grid;place-items:center;border-radius:9px;color:var(--aqua);font-size:18px}
+.eyebrow{font-size:11px;letter-spacing:.17em;text-transform:uppercase;font-weight:800;color:var(--aqua);margin-top:29px}
+h1{font:500 clamp(39px,5.4vw,73px)/1.07 Georgia,Times New Roman,serif;letter-spacing:-.04em;margin:9px 0 12px}h1 em{font-style:normal;color:#86e3d5}
+.lead{max-width:830px;color:#bccdd8;font-size:clamp(15px,1.4vw,18px);margin:0 0 23px}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:17px}
+.stage{background:#081a2b;border:1px solid var(--line);border-radius:17px;overflow:hidden;min-width:0;position:relative}
+.canvas-holder{height:560px;position:relative}canvas{width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
+.overlay{position:absolute;top:15px;left:15px;right:15px;display:flex;justify-content:space-between;gap:10px;pointer-events:none;flex-wrap:wrap}
+.pill{font-size:11px;border-radius:30px;background:rgba(6,19,33,.82);border:1px solid rgba(148,196,216,.24);padding:6px 10px;color:#d5eaf0;font-variant-numeric:tabular-nums}.pill strong{color:var(--aqua)}
+.stage-footer{background:rgba(9,28,44,.85);border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:11px 16px;font-size:12px;color:var(--muted)}
+kbd{font:12px monospace;border:1px solid #386078;padding:1px 5px;border-radius:4px;color:#f4f9fc}
+.side{border:1px solid var(--line);border-radius:17px;background:linear-gradient(150deg,#142d44,#0c2031);padding:20px;min-width:0}
+h2{font-size:18px;letter-spacing:-.02em;margin:0 0 4px}.muted{color:var(--muted)}.small{font-size:12px}.section-label{font-size:11px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:#8fe3d5;margin:24px 0 10px}
+.field{margin:0 0 15px}.field-head{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;font-weight:650;margin-bottom:7px}.field-head output{color:var(--aqua);font-variant-numeric:tabular-nums}
+select{width:100%;border:1px solid #3c5b6c;border-radius:8px;background:#0b2032;color:var(--fg);padding:10px 11px;outline-offset:3px}
+input[type=range]{width:100%;accent-color:var(--aqua);height:17px;cursor:pointer}
+input[type=checkbox]{accent-color:var(--aqua)}
+.group{display:grid;grid-template-columns:1fr 1fr;gap:8px}.btn{border:1px solid #45657a;background:#17374f;color:#e3f0f5;border-radius:9px;padding:10px 7px;min-height:42px;font-weight:680;font-size:12px;transition:.15s}.btn:hover{background:#23516c}.btn.primary{background:#5ac8b7;border-color:#7ae5d6;color:#07232a}.btn.primary:hover{background:#8ae9d7}.btn.on{outline:2px solid #e8bc74;outline-offset:1px}.btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.rowopt{display:flex;align-items:center;gap:8px;font-size:12px;color:#d7e6ed;margin:11px 0}
+.note{font-size:11px;color:#a9c0ce;margin:6px 0 0}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:15px 0}
+.stat{border:1px solid var(--line);border-radius:11px;padding:11px 8px;background:rgba(6,24,37,.62)}
+.value{font-size:23px;line-height:1.2;letter-spacing:-.04em;color:#defbf6;font-weight:750;font-variant-numeric:tabular-nums}.label{font-size:10px;color:#9cb8c8;margin-top:4px}
+.comparison{background:#0e2233;border:1px solid var(--line);border-radius:14px;padding:15px 18px;margin-top:17px}.bars{display:grid;gap:10px;margin-top:13px}.barrow{display:grid;grid-template-columns:126px minmax(0,1fr) 38px;align-items:center;gap:10px;font-size:12px;color:#c7dce7}.track{height:9px;background:#223849;border-radius:30px;overflow:hidden}.fill{height:100%;width:0;border-radius:30px;background:linear-gradient(90deg,#3a837f,#7be9d1);transition:width .2s}.barrow.active .fill{background:linear-gradient(90deg,#bd8952,#f4c88d)}.num{text-align:right;font-variant-numeric:tabular-nums;color:#eaf3f8}
+.learn{display:grid;grid-template-columns:1fr 1fr;gap:17px;margin-top:17px}.learn article{background:rgba(15,35,53,.7);border:1px solid var(--line);border-radius:15px;padding:21px 23px}.learn p{color:#bdced9;margin:10px 0 0;font-size:14px;line-height:1.75}
+footer{font-size:12px;color:#96aebb;border-top:1px solid var(--line);margin-top:25px;padding-top:14px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+@media(max-width:980px){.main{grid-template-columns:1fr}.side{display:grid;grid-template-columns:1fr 1fr;gap:0 25px}.side>h2,.side>.small,.side>.section-label,.side>.stats{grid-column:1/-1}.canvas-holder{height:510px}}
+@media(max-width:610px){.shell{width:calc(100% - 20px);padding-top:13px}.canvas-holder{height:430px}.side{display:block;padding:17px}.barrow{grid-template-columns:102px 1fr 32px;font-size:11px}.learn{grid-template-columns:1fr}.overlay{left:8px;right:8px;top:8px}.pill{font-size:10px}h1{font-size:42px}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header><a class="brand" href="https://ai-talks.org"><span class="mark">∴</span><span>AI-TALKS.ORG<br><span style="color:#84a8b8;font-size:10px;letter-spacing:.08em">INTERACTIVE LABS</span></span></a><span class="muted small">Discrete geometry · Interactive research sandbox</span></header>
+<div class="eyebrow">An interactive mathematics experiment</div>
+<h1>The <em>Erdős Distance Lab</em></h1>
+<p class="lead">How many pairs of points can be exactly one unit apart? Build arrangements, drag vertices, and compare grids with alternative lattices. Explore the deceptively simple problem behind a landmark 2026 AI-generated mathematical discovery.</p>
+<div class="main">
+<section class="stage" aria-label="Interactive point configuration">
+<div class="canvas-holder"><canvas id="plane" aria-label="Coordinate plane with editable points and highlighted near-unit distance pairs"></canvas>
+<div class="overlay"><span class="pill">TARGET DISTANCE <strong>1.000</strong></span><span class="pill">HIGHLIGHT <strong id="tolChip">± 0.020</strong></span></div></div>
+<div class="stage-footer"><span id="hint">Drag any point · Double-click empty space to add · Shift-click a point to remove</span><span><kbd>Delete</kbd> removes selection</span></div>
+</section>
+<aside class="side">
+<h2>Experiment controls</h2><div class="small muted">Modify a configuration and watch its unit-distance graph update instantly.</div>
+<div class="section-label">Starting arrangement</div>
+<div class="field"><label class="field-head" for="preset">Geometry</label>
+<select id="preset"><option value="grid1">Square grid · nearest neighbors</option><option value="grid2">Rescaled grid · diagonals (√2)</option><option value="grid5" selected>Rescaled grid · knight moves (√5)</option><option value="grid10">Rescaled grid · √10</option><option value="triangle">Triangular lattice</option><option value="ring">Regular polygon (unit sides)</option><option value="random">Random cloud</option></select></div>
+<div class="field"><label class="field-head" for="count"><span>Number of points</span><output id="countOut">100</output></label><input id="count" type="range" min="9" max="196" value="100" step="1"></div>
+<div class="field"><label class="field-head" for="tolerance"><span>Visual matching tolerance</span><output id="tolOut">± 0.020</output></label><input id="tolerance" type="range" min="0.002" max="0.140" value="0.020" step="0.002"><div class="note">The theorem concerns <strong>exact</strong> distance 1. A small tolerance is used here so dragged points remain visually meaningful.</div></div>
+<div class="group"><button class="btn primary" id="reset">↺ New arrangement</button><button class="btn" id="optimize">▶ Explore locally</button><button class="btn" id="remove">− Remove point</button><button class="btn" id="add">＋ Add point</button></div>
+<label class="rowopt"><input id="edges" type="checkbox" checked> Highlight matching pairs</label>
+<label class="rowopt"><input id="gridlines" type="checkbox" checked> Show coordinate grid</label>
+<div class="section-label">Live measurements</div>
+<div class="stats"><div class="stat"><div class="value" id="nVal">100</div><div class="label">Points</div></div><div class="stat"><div class="value" id="pairVal">0</div><div class="label">Near-unit pairs</div></div><div class="stat"><div class="value" id="degreeVal">0.00</div><div class="label">Avg. degree</div></div></div>
+<div class="group"><button class="btn" id="fit">Fit to view</button><button class="btn" id="export">Save PNG</button></div><p class="note" id="status" role="status">Try the rescaled √5 grid and compare it to the ordinary square grid.</p>
+</aside>
+</div>
+<section class="comparison"><h2>Compare arrangements</h2><div class="small muted">Counts for the same number of points and tolerance. The grid counts are mathematically exact at the preset coordinates; the random example is seeded for reproducibility. These are examples, not mathematical upper bounds.</div><div class="bars" id="bars"></div></section>
+<div class="learn"><article><div class="section-label" style="margin-top:0">What counts as a unit distance?</div><h2>One distance, many possible connections</h2><p>For distinct points P and Q, a unit-distance pair satisfies <strong>(x₁ − x₂)² + (y₁ − y₂)² = 1</strong>. The green lines join pairs that satisfy this relation within the small visualization tolerance. A rescaled grid with spacing 1/√5 connects points displaced by (1, 2) grid steps—the familiar chess knight's move. The surprising result: one can beat the ordinary nearest-neighbor grid without any sophisticated mathematics.</p></article><article><div class="section-label" style="margin-top:0">What happened in May 2026?</div><h2>The genuine breakthrough is asymptotic</h2><p>Erdős conjectured that the maximum number of unit-distance pairs grows like n<sup>1+o(1)</sup>. A 2026 AI-generated construction, subsequently checked by mathematicians, instead gave at least n<sup>1+δ</sup> pairs for infinitely many n, with a fixed positive δ. Its proof uses deep algebraic number theory and <strong>is not reproduced by this finite-size sandbox</strong>. Here we explore intuition and geometry, not the published counterexample.</p><p><a href="https://arxiv.org/abs/2605.20695" target="_blank" rel="noopener">Read the human-verified paper ↗</a> · <a href="https://www.erdosproblems.com/90" target="_blank" rel="noopener">Erdős Problem 90 ↗</a></p></article></div>
+<footer><span>© AI-Talks.org · Designed as an educational exploration of the Erdős unit-distance problem.</span><span>No libraries, server, registration, or data collection required.</span></footer>
+</div>
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const canvas=$('plane'),ctx=canvas.getContext('2d');
+const state={pts:[],preset:'grid5',n:100,tol:.02,cam:{x:0,y:0},scale:60,sel:-1,drag:-1,tool:'drag',running:false,showEdges:true,showGrid:true};
+let W=700,H=560,dpr=1,raf=0,steps=0;
+const presets=[['grid1','Square (1)'],['grid2','Diagonal (√2)'],['grid5','Knight (√5)'],['grid10','√10 lattice'],['triangle','Triangular'],['ring','Unit polygon'],['random','Random']];
+function random(seed){let x=seed>>>0;return ()=>{x=(Math.imul(x,1664525)+1013904223)>>>0;return x/4294967296;};}
+function build(type,n){
+ const arr=[],r=random(71339+n*97),columns=Math.ceil(Math.sqrt(n)),rows=Math.ceil(n/columns);
+ if(type.startsWith('grid')){const k=Number(type.slice(4)),s=1/Math.sqrt(k);for(let i=0;i<n;i++){const c=i%columns,row=Math.floor(i/columns);arr.push({x:(c-(columns-1)/2)*s,y:(row-(rows-1)/2)*s});}}
+ else if(type==='triangle'){for(let i=0;i<n;i++){const c=i%columns,row=Math.floor(i/columns);arr.push({x:c+.5*(row%2)-(columns-1)/2,y:(row-(rows-1)/2)*Math.sqrt(3)/2});}}
+ else if(type==='ring'){const radius=1/(2*Math.sin(Math.PI/n));for(let i=0;i<n;i++){const t=2*Math.PI*i/n;arr.push({x:radius*Math.cos(t),y:radius*Math.sin(t)});}}
+ else{const side=Math.max(4,Math.sqrt(n)*.9);for(let i=0;i<n;i++)arr.push({x:(r()-.5)*side*1.35,y:(r()-.5)*side});}
+ return arr;
+}
+function matched(a,b,tol){const dx=a.x-b.x,dy=a.y-b.y,d=Math.hypot(dx,dy);return Math.abs(d-1)<=tol;}
+function countPairs(arr,tol){let count=0;for(let i=0;i<arr.length;i++)for(let j=i+1;j<arr.length;j++)if(matched(arr[i],arr[j],tol))count++;return count;}
+function resize(){const b=canvas.getBoundingClientRect();W=b.width;H=b.height;dpr=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);paint();}
+function fit(){if(!state.pts.length){state.cam={x:0,y:0};state.scale=60;return;}let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;for(const p of state.pts){minX=Math.min(minX,p.x);maxX=Math.max(maxX,p.x);minY=Math.min(minY,p.y);maxY=Math.max(maxY,p.y);}state.cam={x:(minX+maxX)/2,y:(minY+maxY)/2};const rx=Math.max(2.4,maxX-minX),ry=Math.max(2.4,maxY-minY);state.scale=Math.min((W-100)/rx,(H-100)/ry,140);state.scale=Math.max(7,state.scale);}
+const X=x=>W/2+(x-state.cam.x)*state.scale,Y=y=>H/2-(y-state.cam.y)*state.scale;
+function world(px,py){return{x:(px-W/2)/state.scale+state.cam.x,y:(H/2-py)/state.scale+state.cam.y};}
+function paint(){
+ if(!ctx||!W||!H)return;ctx.clearRect(0,0,W,H);ctx.fillStyle='#081a2b';ctx.fillRect(0,0,W,H);
+ const g=ctx.createRadialGradient(W*.48,H*.48,20,W*.48,H*.48,Math.max(W,H)*.65);g.addColorStop(0,'#123047');g.addColorStop(1,'#071625');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+ if(state.showGrid){const step=state.scale>=22?1:(state.scale>=10?2:5);ctx.lineWidth=1;ctx.strokeStyle='rgba(150,191,215,.08)';const lx=state.cam.x-W/(2*state.scale),rx=state.cam.x+W/(2*state.scale),by=state.cam.y-H/(2*state.scale),ty=state.cam.y+H/(2*state.scale);
+ for(let x=Math.ceil(lx/step)*step;x<=rx;x+=step){ctx.beginPath();ctx.moveTo(X(x),0);ctx.lineTo(X(x),H);ctx.stroke();}
+ for(let y=Math.ceil(by/step)*step;y<=ty;y+=step){ctx.beginPath();ctx.moveTo(0,Y(y));ctx.lineTo(W,Y(y));ctx.stroke();}
+ ctx.strokeStyle='rgba(143,204,218,.22)';ctx.beginPath();ctx.moveTo(X(0),0);ctx.lineTo(X(0),H);ctx.moveTo(0,Y(0));ctx.lineTo(W,Y(0));ctx.stroke();}
+ let hits=0;const deg=new Array(state.pts.length).fill(0);const drawLines=state.showEdges;
+ if(drawLines){ctx.strokeStyle='rgba(112,234,207,.40)';ctx.lineWidth=1.25;ctx.beginPath();}
+ for(let i=0;i<state.pts.length;i++)for(let j=i+1;j<state.pts.length;j++){
+ if(matched(state.pts[i],state.pts[j],state.tol)){hits++;deg[i]++;deg[j]++;if(drawLines){ctx.moveTo(X(state.pts[i].x),Y(state.pts[i].y));ctx.lineTo(X(state.pts[j].x),Y(state.pts[j].y));}}
+ }
+ if(drawLines)ctx.stroke();
+ for(let i=0;i<state.pts.length;i++){const p=state.pts[i],x=X(p.x),y=Y(p.y),sel=i===state.sel;ctx.beginPath();ctx.arc(x,y,sel?7:deg[i]?4.0:3.3,0,Math.PI*2);ctx.fillStyle=sel?'#ffd795':deg[i]?'#b4f8e8':'#8aabc0';ctx.fill();if(sel){ctx.strokeStyle='rgba(255,216,153,.75)';ctx.lineWidth=2;ctx.stroke();}}
+ $('nVal').textContent=state.pts.length;$('pairVal').textContent=hits;$('degreeVal').textContent=state.pts.length?(2*hits/state.pts.length).toFixed(2):'0.00';
+}
+function compare(){const vals=presets.map(([id])=>({id,count:countPairs(build(id,state.n),state.tol)}));const current=countPairs(state.pts,state.tol);vals.push({id:'current',count:current});const max=Math.max(...vals.map(v=>v.count),1);$('bars').innerHTML=vals.map(v=>{const label=v.id==='current'?'Current canvas':presets.find(p=>p[0]===v.id)[1];return '<div class="barrow '+(v.id==='current'?'active':'')+'"><span>'+label+'</span><div class="track"><div class="fill" style="width:'+(100*v.count/max).toFixed(1)+'%"></div></div><span class="num">'+v.count+'</span></div>';}).join('');}
+function stop(){state.running=false;$('optimize').textContent='▶ Explore locally';$('optimize').classList.remove('on');}
+function reset(){stop();state.preset=$('preset').value;state.n=Number($('count').value);state.pts=build(state.preset,state.n);state.sel=-1;$('countOut').textContent=state.n;fit();paint();compare();$('status').textContent='Arrangements compare the number of near-unit pairs; they are not a proof of a global optimum.';}
+function touchPos(e){const r=canvas.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top};}
+function nearest(px,py){let best=-1,ds=Infinity;for(let i=0;i<state.pts.length;i++){const dx=X(state.pts[i].x)-px,dy=Y(state.pts[i].y)-py,d=dx*dx+dy*dy;if(d<ds){ds=d;best=i;}}return ds<160?best:-1;}
+function toolSet(t){state.tool=state.tool===t?'drag':t;$('add').classList.toggle('on',state.tool==='add');$('remove').classList.toggle('on',state.tool==='remove');canvas.style.cursor=state.tool==='drag'?'crosshair':state.tool==='add'?'copy':'not-allowed';}
+canvas.addEventListener('pointerdown',e=>{const q=touchPos(e);const i=nearest(q.x,q.y);if((e.shiftKey||state.tool==='remove')&&i>=0){state.pts.splice(i,1);state.sel=-1;state.n=state.pts.length;paint();compare();return;}if(state.tool==='add'&&state.pts.length<250){state.pts.push(world(q.x,q.y));state.sel=state.pts.length-1;state.n=state.pts.length;paint();compare();return;}if(i>=0){state.sel=i;state.drag=i;canvas.setPointerCapture(e.pointerId);}else state.sel=-1;paint();});
+canvas.addEventListener('pointermove',e=>{if(state.drag<0)return;const q=touchPos(e);state.pts[state.drag]=world(q.x,q.y);paint();});
+function up(){if(state.drag>=0){state.drag=-1;compare();}}canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
+canvas.addEventListener('dblclick',e=>{if(state.pts.length>=250)return;const q=touchPos(e);if(nearest(q.x,q.y)===-1){state.pts.push(world(q.x,q.y));state.n=state.pts.length;paint();compare();}});
+window.addEventListener('keydown',e=>{if((e.key==='Delete'||e.key==='Backspace')&&state.sel>=0&&document.activeElement.tagName!=='INPUT'){state.pts.splice(state.sel,1);state.sel=-1;state.n=state.pts.length;paint();compare();}});
+function localScore(i,x,y){let s=0;for(let j=0;j<state.pts.length;j++){if(j===i)continue;const q=state.pts[j],d=Math.hypot(x-q.x,y-q.y);s+=Math.exp(-Math.pow((d-1)/.095,2));if(d<.30)s-=12*(.30-d)/.30;}return s;}
+function anneal(){if(!state.running)return;if(state.pts.length>170){stop();$('status').textContent='Local exploration is limited to 170 points for responsiveness.';return;}
+ for(let k=0;k<16;k++){const i=Math.floor(Math.random()*state.pts.length),p=state.pts[i],old=localScore(i,p.x,p.y),size=[.12,.3,.65][Math.floor(Math.random()*3)],a=Math.random()*Math.PI*2,x=p.x+Math.cos(a)*size,y=p.y+Math.sin(a)*size,newScore=localScore(i,x,y);if(newScore>=old||Math.random()<.012*Math.exp(Math.min(0,(newScore-old)/.18))){p.x=x;p.y=y;}}
+ steps++;paint();if(steps%12===0)compare();raf=requestAnimationFrame(anneal);
+}
+$('reset').addEventListener('click',reset);$('preset').addEventListener('change',reset);
+$('count').addEventListener('input',()=>{$('countOut').textContent=$('count').value;});$('count').addEventListener('change',reset);
+$('tolerance').addEventListener('input',()=>{state.tol=Number($('tolerance').value);$('tolOut').textContent='± '+state.tol.toFixed(3);$('tolChip').textContent='± '+state.tol.toFixed(3);paint();compare();});
+$('edges').addEventListener('change',e=>{state.showEdges=e.target.checked;paint();});$('gridlines').addEventListener('change',e=>{state.showGrid=e.target.checked;paint();});
+$('fit').addEventListener('click',()=>{fit();paint();});$('add').addEventListener('click',()=>toolSet('add'));$('remove').addEventListener('click',()=>toolSet('remove'));
+$('optimize').addEventListener('click',()=>{if(state.running){stop();compare();return;}if(state.pts.length>170){$('status').textContent='Reduce the number of points to 170 or fewer to explore locally.';return;}state.running=true;steps=0;$('optimize').textContent='Ⅱ Stop exploring';$('optimize').classList.add('on');$('status').textContent='Heuristic search adjusts points toward many near-unit connections; it does not guarantee the maximum.';anneal();});
+$('export').addEventListener('click',()=>{paint();const a=document.createElement('a');a.download='erdos-distance-lab.png';a.href=canvas.toDataURL('image/png');a.click();});
+window.addEventListener('resize',()=>{resize();});
+resize();reset();
+})();
+</script>
+</body>
+</html>
